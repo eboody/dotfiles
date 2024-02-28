@@ -42,6 +42,8 @@ map('n', '<m-k>', '<C-w>k', opts)
 map('n', '<m-l>', '<C-w>l', opts)
 map('n', '<m-tab>', '<c-6>', opts)
 
+vim.api.nvim_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+
 return {
   {
     'nvim-neo-tree/neo-tree.nvim',
