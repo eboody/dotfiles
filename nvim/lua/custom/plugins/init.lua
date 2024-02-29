@@ -9,6 +9,25 @@ vim.g.material_style = 'deep ocean'
 local map = vim.api.nvim_set_keymap
 local opts = { noremap = true, silent = true }
 
+-- Correctly mapping in Normal mode to use 'pu' and 'pu!' commands
+vim.api.nvim_set_keymap('n', 'p', ':pu<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'P', ':pu!_<CR>', { noremap = true, silent = true })
+
+-- keep cursor at the same place when joining lines, moving, and searching
+vim.keymap.set('n', 'J', 'mzJ`z')
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
+vim.keymap.set('n', 'n', 'nzzzv')
+vim.keymap.set('n', 'N', 'Nzzzv')
+
+vim.keymap.set('x', '<leader>p', [["_dP]])
+
+vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]])
+vim.keymap.set('n', '<leader>Y', [["+Y]])
+
+vim.keymap.set('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+-- vim.o.clipboard = 'unnamedplus'
+
 -- Saving with <C-s>
 map('n', '<C-s>', ':w<CR>', opts)
 
@@ -46,6 +65,23 @@ vim.api.nvim_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.rename()<CR>', 
 
 return {
   {
+    'christoomey/vim-tmux-navigator',
+    cmd = {
+      'TmuxNavigateLeft',
+      'TmuxNavigateDown',
+      'TmuxNavigateUp',
+      'TmuxNavigateRight',
+      'TmuxNavigatePrevious',
+    },
+    keys = {
+      { '<c-h>', '<cmd><C-U>TmuxNavigateLeft<cr>' },
+      { '<c-j>', '<cmd><C-U>TmuxNavigateDown<cr>' },
+      { '<c-k>', '<cmd><C-U>TmuxNavigateUp<cr>' },
+      { '<c-l>', '<cmd><C-U>TmuxNavigateRight<cr>' },
+      { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>' },
+    },
+  },
+  {
     'nvim-neo-tree/neo-tree.nvim',
     version = '*',
     dependencies = {
@@ -66,7 +102,63 @@ return {
       vim.cmd 'colorscheme material'
 
       -- You can configure highlights by doing something like
-      vim.cmd.hi 'Comment gui=none'
+      -- vim.cmd.hi 'Comment gui=none'
+    end,
+  },
+  {
+    'saecki/crates.nvim',
+    tag = 'stable',
+    config = function()
+      local crates = require 'crates'
+
+      local function show_documentation()
+        local filetype = vim.bo.filetype
+        if vim.tbl_contains({ 'vim', 'help' }, filetype) then
+          vim.cmd('h ' .. vim.fn.expand '<cword>')
+        elseif vim.tbl_contains({ 'man' }, filetype) then
+          vim.cmd('Man ' .. vim.fn.expand '<cword>')
+        elseif vim.fn.expand 'u%:t' == 'Cargo.toml' and require('crates').popup_available() then
+          require('crates').show_popup()
+        else
+          vim.lsp.buf.hover()
+        end
+      end
+
+      vim.keymap.set('n', '<leader>ct', crates.toggle, opts)
+      vim.keymap.set('n', '<leader>cr', crates.reload, opts)
+
+      vim.keymap.set('n', '<leader>cv', crates.show_versions_popup, opts)
+      vim.keymap.set('n', '<leader>cf', crates.show_features_popup, opts)
+      vim.keymap.set('n', '<leader>cd', crates.show_dependencies_popup, opts)
+
+      vim.keymap.set('n', '<leader>cu', crates.update_crate, opts)
+      vim.keymap.set('v', '<leader>cu', crates.update_crates, opts)
+      vim.keymap.set('n', '<leader>ca', crates.update_all_crates, opts)
+      vim.keymap.set('n', '<leader>cU', crates.upgrade_crate, opts)
+      vim.keymap.set('v', '<leader>cU', crates.upgrade_crates, opts)
+      vim.keymap.set('n', '<leader>cA', crates.upgrade_all_crates, opts)
+
+      vim.keymap.set('n', '<leader>cx', crates.expand_plain_crate_to_inline_table, opts)
+      vim.keymap.set('n', '<leader>cX', crates.extract_crate_into_table, opts)
+
+      vim.keymap.set('n', '<leader>cH', crates.open_homepage, opts)
+      vim.keymap.set('n', '<leader>cR', crates.open_repository, opts)
+      vim.keymap.set('n', '<leader>cD', show_documentation, { silent = true })
+      vim.keymap.set('n', '<leader>cC', crates.open_crates_io, opts)
+
+      vim.keymap.set('n', 'K', show_documentation, { silent = true })
+      require('crates').setup {
+        null_ls = {
+          enabled = true,
+          name = 'crates.nvim',
+        },
+        src = {
+          coq = {
+            enabled = true,
+            name = 'crates.nvim',
+          },
+        },
+      }
     end,
   },
 }

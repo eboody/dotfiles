@@ -89,6 +89,16 @@ vim.cmd 'command! W w'
 vim.cmd 'command! Wq wq'
 vim.cmd 'command! WQ wq'
 vim.cmd 'cd %:p:h'
+vim.defer_fn(function()
+  vim.cmd ':Neotree close'
+end, 200) -- Delays for 1000 milliseconds (1 second)
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  pattern = '*',
+  callback = function()
+    vim.lsp.buf.format { timeout_ms = 1000 }
+  end,
+})
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -239,13 +249,13 @@ require('lazy').setup({
     'folke/flash.nvim',
     event = 'VeryLazy',
     opts = {},
-  -- stylua: ignore
+    -- stylua: ignore
     keys = {
-      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
-      { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-      { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-      { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
+      { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
+      { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
+      { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
     },
   },
 
@@ -300,9 +310,27 @@ require('lazy').setup({
     config = function() -- This is the function that runs, AFTER loading
       require('which-key').setup()
 
+      local crates = require 'crates'
+
       -- Document existing key chains
       require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+        ['<leader>c'] = {
+          name = '[C]rates', -- Updated group name to Crates
+          t = { crates.toggle, 'Toggle Crates' },
+          r = { crates.reload, 'Reload Crates' },
+          v = { crates.show_versions_popup, 'Show Versions' },
+          f = { crates.show_features_popup, 'Show Features' },
+          d = { crates.show_dependencies_popup, 'Show Dependencies' },
+          u = { crates.update_crate, 'Update Crate' },
+          U = { crates.upgrade_crate, 'Upgrade Crate' },
+          a = { crates.update_all_crates, 'Update All Crates' },
+          A = { crates.upgrade_all_crates, 'Upgrade All Crates' },
+          x = { crates.expand_plain_crate_to_inline_table, 'Expand Crate' },
+          X = { crates.extract_crate_into_table, 'Extract Crate' },
+          H = { crates.open_homepage, 'Open Homepage' },
+          R = { crates.open_repository, 'Open Repository' },
+          D = { crates.open_documentation, 'Open Documentation' },
+        },
         ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
         ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
         ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
@@ -343,7 +371,7 @@ require('lazy').setup({
       -- Useful for getting pretty icons, but requires special font.
       --  If you already have a Nerd Font, or terminal set up with fallback fonts
       --  you can enable this
-      -- { 'nvim-tree/nvim-web-devicons' }
+      { 'nvim-tree/nvim-web-devicons' },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -568,7 +596,7 @@ require('lazy').setup({
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -716,7 +744,7 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<CR>'] = cmp.mapping.confirm { select = true },
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -746,6 +774,7 @@ require('lazy').setup({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'crates' },
         },
       }
     end,
