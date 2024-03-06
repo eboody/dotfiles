@@ -10,7 +10,14 @@ local map = vim.api.nvim_set_keymap
 local opts = { noremap = true, silent = true }
 
 -- for obisidna.nvim
-vim.g.conceallevel = 1
+vim.o.conceallevel = 2
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
+  callback = function()
+    vim.api.nvim_buf_set_keymap(0, 'n', 'gd', ':ObsidianFollowLink<CR>', { noremap = true, silent = true })
+  end,
+})
 
 -- Correctly mapping in Normal mode to use 'pu' and 'pu!' commands
 vim.api.nvim_set_keymap('n', 'p', ':pu<CR>', { noremap = true, silent = true })
