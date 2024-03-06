@@ -736,10 +736,23 @@ require('lazy').setup({
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
         mapping = cmp.mapping.preset.insert {
-          -- Select the [n]ext item
-          ['<C-n>'] = cmp.mapping.select_next_item(),
-          -- Select the [p]revious item
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
+          -- Select the next item with Tab
+          ['<Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            else
+              fallback() -- Allows you to still use Tab for other purposes when the completion menu is not visible
+            end
+          end, { 'i', 's' }),
+
+          -- Select the previous item with Shift+Tab
+          ['<S-Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            else
+              fallback() -- Allows you to still use Shift+Tab for other purposes when the completion menu is not visible
+            end
+          end, { 'i', 's' }),
 
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.

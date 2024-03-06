@@ -9,6 +9,9 @@ vim.g.material_style = 'deep ocean'
 local map = vim.api.nvim_set_keymap
 local opts = { noremap = true, silent = true }
 
+-- for obisidna.nvim
+vim.g.conceallevel = 1
+
 -- Correctly mapping in Normal mode to use 'pu' and 'pu!' commands
 vim.api.nvim_set_keymap('n', 'p', ':pu<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'P', ':pu!_<CR>', { noremap = true, silent = true })
@@ -63,7 +66,51 @@ map('n', '<m-tab>', '<c-6>', opts)
 
 vim.api.nvim_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
 
+function insert_foldable_region()
+  local region_name = vim.fn.input 'Region Description: '
+  local indent = string.rep(' ', vim.fn.indent '.')
+  local start_marker = indent .. '/* {{{ Region: ' .. region_name .. ' */'
+  local end_marker = indent .. '/* End Region:  ' .. region_name .. ' }}} */'
+  local line_num = vim.api.nvim_win_get_cursor(0)[1]
+  vim.api.nvim_buf_set_lines(0, line_num, line_num, false, { start_marker, '', end_marker })
+  vim.api.nvim_win_set_cursor(0, { line_num + 1, 0 })
+end
+
+-- Key mapping
+vim.api.nvim_set_keymap('n', '<Leader>fr', '', { noremap = true, silent = true, callback = insert_foldable_region })
+
+-- Optionally, set 'foldmethod' to 'marker' for the current window
+vim.wo.foldmethod = 'marker'
+
 return {
+  {
+    'epwalsh/obsidian.nvim',
+    version = '*', -- recommended, use latest release instead of latest commit
+    lazy = true,
+    ft = 'markdown',
+    -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+    -- event = {
+    --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+    --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
+    --   "BufReadPre path/to/my-vault/**.md",
+    --   "BufNewFile path/to/my-vault/**.md",
+    -- },
+    dependencies = {
+      -- Required.
+      'nvim-lua/plenary.nvim',
+
+      -- see below for full list of optional dependencies 👇
+    },
+    opts = {
+      conceallevel = 1,
+      workspaces = {
+        {
+          name = 'personal',
+          path = '~/Documents/notes',
+        },
+      },
+    },
+  },
   {
     'christoomey/vim-tmux-navigator',
     cmd = {
@@ -157,6 +204,24 @@ return {
             enabled = true,
             name = 'crates.nvim',
           },
+        },
+      }
+    end,
+  },
+  {
+    'simrat39/rust-tools.nvim',
+
+    config = function()
+      local rt = require 'rust-tools'
+
+      rt.setup {
+        server = {
+          on_attach = function(_, bufnr)
+            -- Hover actions
+            vim.keymap.set('n', '<C-space>', rt.hover_actions.hover_actions, { buffer = bufnr })
+            -- Code action groups
+            vim.keymap.set('n', '<Leader>la', rt.code_action_group.code_action_group, { buffer = bufnr })
+          end,
         },
       }
     end,
