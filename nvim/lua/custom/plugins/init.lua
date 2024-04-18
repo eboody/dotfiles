@@ -1,3 +1,52 @@
+-- vim.cmd [[
+--   autocmd FileType rust highlight macro ctermfg=8 guifg=#555555
+-- ]]
+-- vim.api.nvim_create_autocmd('FileType', {
+--   pattern = 'rust',
+--   callback = function()
+--     vim.api.nvim_set_hl(0, 'macro', { fg = '#555555' })
+--   end,
+-- })
+--
+-- auto close neotree when I close the editor buffer
+
+-- Use :Quit instead of :q to quit Neovim
+-- vim.api.nvim_create_autocmd('BufWritePre', {
+--   callback = function()
+--     vim.cmd 'Neotree close'
+--   end,
+-- })
+
+function CycleLineEndings(endings)
+  local line = vim.api.nvim_get_current_line()
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+  local col = cursor_pos[2] + 1
+
+  local current_ending = ''
+  for _, ending in ipairs(endings) do
+    if line:sub(-#ending) == ending then
+      current_ending = ending
+      break
+    end
+  end
+
+  local next_index = 1
+  for i, ending in ipairs(endings) do
+    if ending == current_ending then
+      next_index = i % #endings + 1
+      break
+    end
+  end
+
+  local new_line = line:sub(1, #line - #current_ending) .. endings[next_index]
+  vim.api.nvim_set_current_line(new_line)
+
+  local new_col = #new_line < col and #new_line or col
+  vim.api.nvim_win_set_cursor(0, { cursor_pos[1], new_col - 1 })
+end
+
+vim.api.nvim_set_keymap('n', '<M-;>', ":lua CycleLineEndings({'',';'})<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<M-C-;>', ":lua CycleLineEndings({'.await;','.await?;', ';'})<CR>", { noremap = true, silent = true })
 --  I promise not to create any merge conflicts in this directory :)
 --
 -- See the kickstart.nvim README for more information
@@ -30,6 +79,7 @@ vim.keymap.set('n', 'n', 'nzzzv')
 vim.keymap.set('n', 'N', 'Nzzzv')
 
 vim.keymap.set('x', '<leader>p', [["_dP]])
+vim.keymap.set('n', '<leader>ll', ':LspRestart<CR>')
 
 vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]])
 vim.keymap.set('n', '<leader>Y', [["+Y]])

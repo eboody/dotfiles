@@ -89,9 +89,9 @@ vim.cmd 'command! W w'
 vim.cmd 'command! Wq wq'
 vim.cmd 'command! WQ wq'
 vim.cmd 'cd %:p:h'
-vim.defer_fn(function()
-  vim.cmd ':Neotree close'
-end, 200) -- Delays for 1000 milliseconds (1 second)
+-- vim.defer_fn(function()
+--   vim.cmd ':Neotree close'
+-- end, 200) -- Delays for 1000 milliseconds (1 second)
 
 vim.api.nvim_create_autocmd('BufWritePre', {
   pattern = '*',
