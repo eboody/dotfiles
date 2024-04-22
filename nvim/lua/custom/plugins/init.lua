@@ -139,8 +139,15 @@ vim.api.nvim_set_keymap('n', '<Leader>fr', '', { noremap = true, silent = true, 
 
 -- Optionally, set 'foldmethod' to 'marker' for the current window
 vim.wo.foldmethod = 'marker'
+vim.opt.termguicolors = true
 
 return {
+  {
+    'brenoprata10/nvim-highlight-colors',
+    config = function()
+      require('nvim-highlight-colors').setup {}
+    end,
+  },
   {
     'ggandor/flit.nvim',
     config = function()
