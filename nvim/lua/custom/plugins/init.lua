@@ -17,6 +17,28 @@
 --   end,
 -- })
 
+local function find_nearest_error_file()
+  local current_file = vim.fn.expand '%:p'
+  local current_dir = vim.fn.fnamemodify(current_file, ':h')
+
+  while current_dir ~= '' and current_dir ~= '/' do
+    local potential_error_file = current_dir .. '/error.rs'
+    if vim.fn.filereadable(potential_error_file) == 1 then
+      vim.cmd('edit ' .. potential_error_file)
+      return
+    end
+    current_dir = vim.fn.fnamemodify(current_dir, ':h')
+  end
+  print 'No nearest error.rs file found'
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'rust',
+  callback = function()
+    vim.keymap.set('n', '<space>E', find_nearest_error_file, { buffer = true })
+  end,
+})
+
 function CycleLineEndings(endings)
   local line = vim.api.nvim_get_current_line()
   local cursor_pos = vim.api.nvim_win_get_cursor(0)
