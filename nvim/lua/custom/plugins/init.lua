@@ -163,6 +163,8 @@ vim.api.nvim_set_keymap('n', '<Leader>fr', '', { noremap = true, silent = true, 
 vim.wo.foldmethod = 'marker'
 vim.opt.termguicolors = true
 
+-- Set the background color for the entire editor
+
 return {
   {
     'brenoprata10/nvim-highlight-colors',
@@ -242,17 +244,33 @@ return {
     end,
   },
   {
-    'marko-cerovac/material.nvim',
+    'sainnhe/sonokai',
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       -- Load the colorscheme here
-      vim.cmd 'colorscheme material'
+      vim.cmd 'colorscheme sonokai'
 
+      vim.api.nvim_set_hl(0, 'Normal', { bg = '#0e0e0e' })
+      vim.api.nvim_set_hl(0, 'Visual', { bg = '#1e1e1e' })
+      vim.api.nvim_set_hl(0, 'NonText', { bg = '#1e1e1e' })
       -- You can configure highlights by doing something like
-      -- vim.cmd.hi 'Comment gui=none'
+      vim.cmd.hi 'Comment gui=none'
     end,
   },
+  -- {
+  --   'marko-cerovac/material.nvim',
+  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
+  --   priority = 1000, -- make sure to load this before all the other start plugins
+  --   config = function()
+  --     -- Load the colorscheme here
+  --     vim.cmd 'colorscheme material'
+  --
+  --     vim.api.nvim_set_hl(0, 'Normal', { bg = '#0e0e0e' })
+  --     -- You can configure highlights by doing something like
+  --     -- vim.cmd.hi 'Comment gui=none'
+  --   end,
+  -- },
   {
     'saecki/crates.nvim',
     tag = 'stable',
