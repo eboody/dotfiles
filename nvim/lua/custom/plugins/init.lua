@@ -16,6 +16,7 @@
 --     vim.cmd 'Neotree close'
 --   end,
 -- })
+--
 
 local function find_nearest_error_file()
   local current_file = vim.fn.expand '%:p'
@@ -165,7 +166,38 @@ vim.opt.termguicolors = true
 
 -- Set the background color for the entire editor
 
+vim.api.nvim_set_keymap('n', '<leader>e', "<cmd>lua require('oil').toggle_float('.')<CR>", { noremap = true, silent = true })
+
 return {
+  {
+    'stevearc/oil.nvim',
+    opts = {},
+    config = function()
+      require('oil').setup {
+        use_default_keymaps = false,
+        keymaps = {
+          ['g?'] = 'actions.show_help',
+          ['<CR>'] = 'actions.select',
+          ['<C-\\>'] = 'actions.select_split',
+          ['<C-enter>'] = 'actions.select_vsplit', -- this is used to navigate left
+          ['<C-t>'] = 'actions.select_tab',
+          ['<C-p>'] = 'actions.preview',
+          ['<C-c>'] = 'actions.close',
+          ['<C-r>'] = 'actions.refresh',
+          ['-'] = 'actions.parent',
+          ['_'] = 'actions.open_cwd',
+          ['`'] = 'actions.cd',
+          ['~'] = 'actions.tcd',
+          ['gs'] = 'actions.change_sort',
+          ['gx'] = 'actions.open_external',
+          ['g.'] = 'actions.toggle_hidden',
+        },
+        view_options = {
+          show_hidden = true,
+        },
+      }
+    end,
+  },
   {
     'brenoprata10/nvim-highlight-colors',
     config = function()
@@ -232,30 +264,20 @@ return {
     },
   },
   {
-    'nvim-neo-tree/neo-tree.nvim',
-    version = '*',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
-      'MunifTanjim/nui.nvim',
-    },
-    config = function()
-      require('neo-tree').setup {}
-    end,
-  },
-  {
     'sainnhe/sonokai',
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
-      -- Load the colorscheme here
+      vim.g.sonokai_enable_italic = true
+      vim.g.sonokai_disable_terminal_colors = false
+      vim.g.sonokai_colors_override = {
+        bg0 = { '#1e1e1e', '235' },
+        bg1 = { '#2e2e2e', '236' },
+        bg2 = { '#2e2e2e', '236' },
+        bg3 = { '#3b3e48', '237' },
+        bg4 = { '#414550', '237' },
+      }
       vim.cmd 'colorscheme sonokai'
-
-      vim.api.nvim_set_hl(0, 'Normal', { bg = '#0e0e0e' })
-      vim.api.nvim_set_hl(0, 'Visual', { bg = '#1e1e1e' })
-      vim.api.nvim_set_hl(0, 'NonText', { bg = '#1e1e1e' })
-      -- You can configure highlights by doing something like
-      vim.cmd.hi 'Comment gui=none'
     end,
   },
   -- {
