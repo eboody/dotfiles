@@ -89,6 +89,7 @@ vim.cmd 'command! W w'
 vim.cmd 'command! Wq wq'
 vim.cmd 'command! WQ wq'
 vim.cmd 'cd %:p:h'
+
 -- vim.defer_fn(function()
 --   vim.cmd ':Neotree close'
 -- end, 200) -- Delays for 1000 milliseconds (1 second)
@@ -280,12 +281,12 @@ require('lazy').setup({
       -- You might want to use either the primary label or the shortcut colors
       -- for Leap primary labels, depending on your taste.
       vim.api.nvim_set_hl(0, 'LeapLabelPrimary', {
-        fg = 'red',
+        fg = '#ff0000',
         bold = true,
         nocombine = true,
       })
       vim.api.nvim_set_hl(0, 'LeapLabelSecondary', {
-        fg = 'blue',
+        fg = '#0000ff',
         bold = true,
         nocombine = true,
       })

@@ -86,13 +86,13 @@ vim.o.conceallevel = 2
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'markdown',
   callback = function()
-    vim.api.nvim_buf_set_keymap(0, 'n', 'gd', ':ObsidianFollowLink<CR>', { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(0, 'n', 'gd', ':ObsidianFollowLink<CR>', opts)
   end,
 })
 
 -- Correctly mapping in Normal mode to use 'pu' and 'pu!' commands
-vim.api.nvim_set_keymap('n', 'p', ':pu<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', 'P', ':pu!<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'p', ':pu<CR>', opts)
+vim.api.nvim_set_keymap('n', 'P', ':pu!<CR>', opts)
 
 -- keep cursor at the same place when joining lines, moving, and searching
 vim.keymap.set('n', 'J', 'mzJ`z')
@@ -143,7 +143,7 @@ map('n', '<m-k>', '<C-w>k', opts)
 map('n', '<m-l>', '<C-w>l', opts)
 map('n', '<m-tab>', '<c-6>', opts)
 
-vim.api.nvim_set_keymap('i', 'jj', '<Esc>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('i', 'jj', '<Esc>', opts)
 
 vim.api.nvim_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
 
@@ -169,6 +169,7 @@ vim.opt.termguicolors = true
 vim.api.nvim_set_keymap('n', '<leader>e', "<cmd>lua require('oil').toggle_float('.')<CR>", { noremap = true, silent = true })
 
 return {
+  { 'echasnovski/mini.nvim' },
   {
     'stevearc/oil.nvim',
     opts = {},
@@ -191,6 +192,18 @@ return {
           ['gs'] = 'actions.change_sort',
           ['gx'] = 'actions.open_external',
           ['g.'] = 'actions.toggle_hidden',
+        },
+        git = {
+          -- Return true to automatically git add/mv/rm files
+          add = function(path)
+            return true
+          end,
+          mv = function(src_path, dest_path)
+            return true
+          end,
+          rm = function(path)
+            return true
+          end,
         },
         view_options = {
           show_hidden = true,
@@ -271,11 +284,11 @@ return {
       vim.g.sonokai_enable_italic = true
       vim.g.sonokai_disable_terminal_colors = false
       vim.g.sonokai_colors_override = {
-        bg0 = { '#1e1e1e', '235' },
-        bg1 = { '#2e2e2e', '236' },
-        bg2 = { '#2e2e2e', '236' },
-        bg3 = { '#3b3e48', '237' },
-        bg4 = { '#414550', '237' },
+        bg0 = { '#0e0e0e', '235' },
+        bg1 = { '#1e1e1e', '236' },
+        bg2 = { '#1e1e1e', '236' },
+        bg3 = { '#2e2e2e', '237' },
+        bg4 = { '#2e2e2e', '237' },
       }
       vim.cmd 'colorscheme sonokai'
     end,
