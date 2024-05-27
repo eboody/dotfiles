@@ -145,7 +145,7 @@ map('n', '<m-tab>', '<c-6>', opts)
 
 vim.api.nvim_set_keymap('i', 'jj', '<Esc>', opts)
 
-vim.api.nvim_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+vim.api.nvim_set_keymap('n', '<leader>e', "<cmd>lua require('oil').toggle_float(vim.fn.expand('%:p:h'))<CR>", { noremap = true, silent = true })
 
 function insert_foldable_region()
   local region_name = vim.fn.input 'Region Description: '
@@ -166,9 +166,21 @@ vim.opt.termguicolors = true
 
 -- Set the background color for the entire editor
 
-vim.api.nvim_set_keymap('n', '<leader>e', "<cmd>lua require('oil').toggle_float('.')<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>e', ":lua require('oil').toggle_float(vim.fn.expand('%:p:h'))<CR>", { noremap = true, silent = true })
 
 return {
+  -- {
+  --   'nvim-neo-tree/neo-tree.nvim',
+  --   version = '*',
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
+  --     'MunifTanjim/nui.nvim',
+  --   },
+  --   config = function()
+  --     require('neo-tree').setup {}
+  --   end,
+  -- },
   { 'echasnovski/mini.nvim' },
   {
     'stevearc/oil.nvim',
@@ -211,12 +223,12 @@ return {
       }
     end,
   },
-  {
-    'brenoprata10/nvim-highlight-colors',
-    config = function()
-      require('nvim-highlight-colors').setup {}
-    end,
-  },
+  -- {
+  --   'brenoprata10/nvim-highlight-colors',
+  --   config = function()
+  --     require('nvim-highlight-colors').setup {}
+  --   end,
+  -- },
   {
     'ggandor/flit.nvim',
     config = function()
