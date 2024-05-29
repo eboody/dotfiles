@@ -94,12 +94,23 @@ vim.cmd 'cd %:p:h'
 --   vim.cmd ':Neotree close'
 -- end, 200) -- Delays for 1000 milliseconds (1 second)
 
-vim.api.nvim_create_autocmd('BufWritePre', {
-  pattern = '*',
-  callback = function()
-    vim.lsp.buf.format { timeout_ms = 1000 }
-  end,
-})
+-- function FormatHTML()
+--   local current_file = vim.fn.expand '%:p'
+--   vim.fn.system('prettier --write ' .. current_file)
+--   vim.cmd 'edit' -- Reload the buffer
+-- end
+--
+-- -- Create an autocommand group for HTML formatting
+-- vim.api.nvim_create_augroup('FormatHTML', { clear = true })
+--
+-- -- Add an autocommand to the group that formats HTML files on save
+-- vim.api.nvim_create_autocmd('BufWritePost', {
+--   group = 'FormatHTML',
+--   pattern = '*.html',
+--   callback = function()
+--     FormatHTML()
+--   end,
+-- })
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -224,6 +235,34 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+local cmp_kinds = {
+  Text = '  ',
+  Method = '  ',
+  Function = '  ',
+  Constructor = '  ',
+  Field = '  ',
+  Variable = '  ',
+  Class = '  ',
+  Interface = '  ',
+  Module = '  ',
+  Property = '  ',
+  Unit = '  ',
+  Value = '  ',
+  Enum = '  ',
+  Keyword = '  ',
+  Snippet = '  ',
+  Color = '  ',
+  File = '  ',
+  Reference = '  ',
+  Folder = '  ',
+  EnumMember = '  ',
+  Constant = '  ',
+  Struct = '  ',
+  Event = '  ',
+  Operator = '  ',
+  TypeParameter = '  ',
+  Copilot = '  ',
+}
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -235,6 +274,8 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
+--
+--
 require('lazy').setup({
 
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -523,6 +564,43 @@ require('lazy').setup({
       { 'j-hui/fidget.nvim', opts = {} },
     },
     config = function()
+      local lspconfig = require 'lspconfig'
+      local configs = require 'lspconfig.configs'
+
+      if not configs.htmldjango then
+        configs.htmldjango = {
+          default_config = {
+            cmd = { 'vscode-html-language-server', '--stdio' },
+            filetypes = { 'htmldjango' },
+            root_dir = lspconfig.util.root_pattern('.git', 'package.json', '.'),
+            settings = {},
+          },
+        }
+      end
+
+      lspconfig.htmldjango.setup {
+        capabilities = require('cmp_nvim_lsp').default_capabilities(),
+        on_attach = function(client)
+          if client.server_capabilities.documentFormattingProvider then
+            vim.cmd [[
+        augroup Format
+          autocmd! * <buffer>
+          autocmd BufWritePre <buffer> lua vim.lsp.buf.format()
+        augroup END
+      ]]
+          end
+        end,
+      }
+
+      -- lspconfig.cssls.setup {
+      --   capabilities = require('cmp_nvim_lsp').default_capabilities(),
+      --   filetypes = { 'htmldjango', 'css', 'scss', 'less' },
+      -- }
+
+      -- lspconfig.tsserver.setup {
+      --   capabilities = require('cmp_nvim_lsp').default_capabilities(),
+      --   filetypes = { 'htmldjango', 'javascript' },
+      -- }
       -- Brief Aside: **What is LSP?**
       --
       -- LSP is an acronym you've probably heard, but might not understand what it is.
@@ -731,7 +809,8 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        javascript = { { 'prettierd', 'prettier' } },
+        javascript = { { 'prettier', 'prettierd' } },
+        html = { { 'prettier', 'prettierd' } },
       },
     },
   },
@@ -752,6 +831,27 @@ require('lazy').setup({
           end
           return 'make install_jsregexp'
         end)(),
+        config = function()
+          local types = require 'luasnip.util.types'
+
+          require('luasnip.loaders.from_vscode').lazy_load()
+          require('luasnip.loaders.from_lua').load { paths = './lua/snippets' }
+
+          require('luasnip').setup {
+            history = true,
+            delete_check_events = 'TextChanged',
+            -- Display a cursor-like placeholder in unvisited nodes
+            -- of the snippet.
+            ext_opts = {
+              [types.insertNode] = {
+                unvisited = {
+                  virt_text = { { '|', 'Conceal' } },
+                  virt_text_pos = 'inline',
+                },
+              },
+            },
+          }
+        end,
       },
       'saadparwaiz1/cmp_luasnip',
 
@@ -765,13 +865,14 @@ require('lazy').setup({
       --    you can use this plugin to help you. It even has snippets
       --    for various frameworks/libraries/etc. but you will have to
       --    set up the ones that are useful for you.
-      -- 'rafamadriz/friendly-snippets',
+      'rafamadriz/friendly-snippets',
     },
     config = function()
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
-      luasnip.config.setup {}
+
+      require('luasnip.loaders.from_vscode').lazy_load()
 
       cmp.setup {
         snippet = {
@@ -779,7 +880,7 @@ require('lazy').setup({
             luasnip.lsp_expand(args.body)
           end,
         },
-        completion = { completeopt = 'menu,menuone,noinsert' },
+        -- completion = { completeopt = 'menu,menuone,noinsert' },
 
         -- For an understanding of why these mappings were
         -- chosen, you will need to read `:help ins-completion`
