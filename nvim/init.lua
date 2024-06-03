@@ -591,6 +591,19 @@ require('lazy').setup({
           end
         end,
       }
+      lspconfig.rust_analyzer.setup {
+        capabilities = require('cmp_nvim_lsp').default_capabilities(),
+        on_attach = function(client)
+          if client.server_capabilities.documentFormattingProvider then
+            vim.cmd [[
+        augroup Format
+          autocmd! * <buffer>
+          autocmd BufWritePre <buffer> lua vim.lsp.buf.format()
+        augroup END
+      ]]
+          end
+        end,
+      }
 
       -- lspconfig.cssls.setup {
       --   capabilities = require('cmp_nvim_lsp').default_capabilities(),
@@ -923,12 +936,12 @@ require('lazy').setup({
           --
           -- <c-l> will move you to the right of each of the expansion locations.
           -- <c-h> is similar, except moving you backwards.
-          ['<C-l>'] = cmp.mapping(function()
+          ['<M-l>'] = cmp.mapping(function()
             if luasnip.expand_or_locally_jumpable() then
               luasnip.expand_or_jump()
             end
           end, { 'i', 's' }),
-          ['<C-h>'] = cmp.mapping(function()
+          ['<M-h>'] = cmp.mapping(function()
             if luasnip.locally_jumpable(-1) then
               luasnip.jump(-1)
             end

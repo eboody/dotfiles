@@ -40,6 +40,28 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+local function find_nearest_cargo_file()
+  local current_file = vim.fn.expand '%:p'
+  local current_dir = vim.fn.fnamemodify(current_file, ':h')
+
+  while current_dir ~= '' and current_dir ~= '/' do
+    local potential_error_file = current_dir .. '/Cargo.toml'
+    if vim.fn.filereadable(potential_error_file) == 1 then
+      vim.cmd('edit ' .. potential_error_file)
+      return
+    end
+    current_dir = vim.fn.fnamemodify(current_dir, ':h')
+  end
+  print 'No nearest Cargo.toml file found'
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'rust',
+  callback = function()
+    vim.keymap.set('n', '<space>C', find_nearest_cargo_file, { buffer = true })
+  end,
+})
+
 function CycleLineEndings(endings)
   local line = vim.api.nvim_get_current_line()
   local cursor_pos = vim.api.nvim_win_get_cursor(0)

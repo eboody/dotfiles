@@ -27,6 +27,95 @@ local ms = ls.multi_snippet
 local k = require('luasnip.nodes.key_indexer').new_key
 
 return {
+  -- Jinja Block
+  s(
+    'block',
+    fmt(
+      [[
+{{% block {} %}}
+  {}
+{{% endblock %}}
+]],
+      {
+        i(1, 'block_name'),
+        i(2, 'content'),
+      }
+    )
+  ),
+  -- Jinja Macro
+  s(
+    'macro',
+    fmt(
+      [[
+{{% macro {}({}) %}}
+  {}
+{{% endmacro %}}
+]],
+      {
+        i(1, 'macro_name'),
+        i(2, 'params'),
+        i(3, 'content'),
+      }
+    )
+  ),
+  -- Jinja Include
+  s(
+    'include',
+    fmt(
+      [[
+{{% include '{}' %}}
+]],
+      {
+        i(1, 'template_name'),
+      }
+    )
+  ),
+  -- Jinja If Statement
+  s(
+    'if',
+    fmt(
+      [[
+{{% if {} %}}
+  {}
+{{% endif %}}
+]],
+      {
+        i(1, 'condition'),
+        i(2, 'content'),
+      }
+    )
+  ),
+  -- Jinja For Loop
+  s(
+    'for',
+    fmt(
+      [[
+{{% for {} in {} %}}
+  {}
+{{% endfor %}}
+]],
+      {
+        i(1, 'item'),
+        i(2, 'collection'),
+        i(3, 'content'),
+      }
+    )
+  ),
+  -- JINJA Tag
+  s(
+    'tag',
+    fmt(
+      [[
+{{% block %}}
+  {}
+{{% endblock %}}
+]],
+      {
+        i(1, 'text'),
+      }
+    )
+  ),
+
   -- HTML Boilerplate
   s(
     'html',
