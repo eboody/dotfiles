@@ -17,6 +17,28 @@
 --   end,
 -- })
 --
+--
+local function find_nearest_mod_file()
+  local current_file = vim.fn.expand '%:p'
+  local current_dir = vim.fn.fnamemodify(current_file, ':h')
+
+  while current_dir ~= '' and current_dir ~= '/' do
+    local potential_error_file = current_dir .. '/mod.rs'
+    if vim.fn.filereadable(potential_error_file) == 1 then
+      vim.cmd('edit ' .. potential_error_file)
+      return
+    end
+    current_dir = vim.fn.fnamemodify(current_dir, ':h')
+  end
+  print 'No nearest mod.rs file found'
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'rust',
+  callback = function()
+    vim.keymap.set('n', '<space>M', find_nearest_mod_file, { buffer = true })
+  end,
+})
 
 local function find_nearest_error_file()
   local current_file = vim.fn.expand '%:p'
