@@ -18,3 +18,5 @@ config.bind('J', 'scroll-page 0 1')
 # Bind K to page up
 config.bind('K', 'scroll-page 0 -1')
 
+c.fonts.hints = 'bold 12pt FantasqueSansM Nerd Font Mono'
+config.bind('D', 'config-cycle colors.webpage.darkmode.enabled')

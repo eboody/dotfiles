@@ -593,6 +593,23 @@ require('lazy').setup({
       }
       lspconfig.rust_analyzer.setup {
         capabilities = require('cmp_nvim_lsp').default_capabilities(),
+        -- settings = {
+        --   ['rust-analyzer'] = {
+        --     lru = {
+        --       capacity = 10000, -- Adjust this value based on available memory
+        --     },
+        --     cargo = {
+        --       loadOutDirsFromCheck = true,
+        --     },
+        --     procMacro = {
+        --       enable = true,
+        --     },
+        --     cachePriming = {
+        --       numThreads = 12, -- Adjust based on CPU cores
+        --     },
+        --     memoryUsage = 'high',
+        --   },
+        -- },
         on_attach = function(client)
           if client.server_capabilities.documentFormattingProvider then
             vim.cmd [[
@@ -824,6 +841,7 @@ require('lazy').setup({
         -- is found.
         javascript = { { 'prettier', 'prettierd' } },
         html = { { 'prettier', 'prettierd' } },
+        htmldjango = { { 'djlint' } },
       },
     },
   },
@@ -1013,11 +1031,15 @@ require('lazy').setup({
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
+        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'css', 'javascript' },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = { enable = true },
         indent = { enable = true },
+        -- Treesitter folding
+        fold = {
+          enable = true,
+        },
       }
 
       -- There are additional nvim-treesitter modules that you can use to interact

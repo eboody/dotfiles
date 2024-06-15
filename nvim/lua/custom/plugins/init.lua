@@ -18,6 +18,8 @@
 -- })
 --
 --
+vim.api.nvim_set_keymap('n', '<space>cs', [[:'<,'>s/\s\+//g<CR>]], { noremap = true, silent = true })
+
 local function find_nearest_mod_file()
   local current_file = vim.fn.expand '%:p'
   local current_dir = vim.fn.fnamemodify(current_file, ':h')
@@ -207,6 +209,15 @@ vim.api.nvim_set_keymap('n', '<Leader>fr', '', { noremap = true, silent = true, 
 -- Optionally, set 'foldmethod' to 'marker' for the current window
 vim.wo.foldmethod = 'marker'
 vim.opt.termguicolors = true
+
+-- -- Enable folding
+-- vim.o.foldenable = true
+--
+-- -- Set the folding method to use an expression
+-- vim.o.foldmethod = 'expr'
+--
+-- -- Set the fold expression
+-- vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
 
 -- Set the background color for the entire editor
 
