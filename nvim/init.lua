@@ -515,6 +515,7 @@ require('lazy').setup({
         builtin.find_files {
           hidden = true, -- Set to false if you don't want to include hidden files
           no_ignore = false, -- Ensure it respects .gitignore
+          file_ignore_patterns = { 'bundle.js' },
         }
       end, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
